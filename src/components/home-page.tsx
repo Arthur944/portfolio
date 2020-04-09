@@ -4,17 +4,28 @@ import styled from 'styled-components';
 import { useTransition, animated } from 'react-spring';
 
 export function HomePage(){
-    const transition = useTransition([0,1,2], {
-        from: { transform: "rotate(90deg)" },
-        enter: (item) => ({ transform: `rotate(${degrees[item]}deg)`})
+    const transition = useTransition(coords, {
+        from: (item, index) => ({
+            top: "50vh",
+            left: "calc(50vw + 0vh)",
+            transform: `rotate(${index*72}deg)`,
+            zIndex: 5-index
+        }),
+        enter: (item, index) => ({
+            top: item[1] + "vh",
+            left: `calc(25vw + ${item[0]}vh)`,
+            transform: `rotate(${index*72}deg)`
+        }),
     });
 
     return(
         <>
             <Hero>
-                { transition((props, item) => (
-                    <Item style={{...props, zIndex: 4 - item, background: `rgb(${(255/4)*item}, ${(255/4)*item}, ${(255/4)*item})`}}/>
-                )) }
+                {transition((props, item, index1, index2 ) => (
+                    <Container style={props}>
+                        <Item style={{background: colors[index2]}}/>
+                    </Container>
+                ))}
                 <HeroMessage>
                     <h1>Hi!</h1>
                     <h2>I'm Artur. I make websites and mobile apps.</h2>
@@ -25,70 +36,43 @@ export function HomePage(){
     );
 }
 
-const Item = styled(animated.div)`
-  position: fixed;
-  right: 0;
-  bottom: calc(100vh/2.618);
-  height: 120vh;
-  width: 100vw;
+const colors = [
+    "#170A1C",
+    "#0B7189",
+    "#228CDB",
+    "#9C95DC",
+    "#C19AB7"
+];
+
+const coords = [
+    [0, 35, 0],
+    [-33.29, 10.81, 1],
+    [-20.57, -28.32, 2],
+    [20.57, -28.32, 3],
+    [33.29, 10.81, 4]
+].map(elem => [elem[0] + 50, elem[1] + 50]);
+
+const Item = styled.div`
+  min-width: 150vw;
+  min-height: 150vh;
   background: blue;
-  border: 1px solid gray;
-  transform-origin: bottom right;
 `;
 
 const degrees = {
     0: 81.61,
     1: 67.54,
     2: 51.83,
-}
+};
 
-const Fifth = styled.div`
+const Container = styled(animated.div)`
   position: absolute;
-  width: 120vw;
-  right: 0;
-  height: 100vh;
-  transform-origin: bottom right;
-  transform: rotate(calc(90deg - 88.78deg));
-  background: black;
-  z-index: 0;
-`;
-
-const Fourth = styled.div`
-  position: absolute;
-  width: 120vw;
-  height: calc(100vh/2.618);
-  right: 0;
-  transform-origin: bottom right;
-  transform: rotate(calc(90deg - 81.61deg));
-  background: gray;
-  z-index: 1;
-`;
-
-const Third = styled.div`
-  position: absolute;
-  width: 100%;
-  height: calc(100vh/2.618);
-  transform-origin: bottom right;
-  transform: rotate(calc(90deg - 67.54deg));
-  background: blue;
-  z-index: 2;
-`;
-
-const Second = styled.div`
-  position: absolute;
-  width: 100%;
-  height: calc(100vh/2.618);
-  transform-origin: bottom right;
-  transform: rotate(calc(90deg - 51.83deg));
-  background: yellow;
-  z-index: 3;
-`;
-
-const First = styled.div`
-  position: absolute;
-  width: 100%;
-  height: calc(100vh/2.618);
-  background: #4e0250;
+  width: 1px;
+  height: 1px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  background: white;
 `;
 
 const HeroMessage = styled.div`
