@@ -1,10 +1,12 @@
-import React from 'react';
+import React, {useState} from 'react';
 import styled from 'styled-components';
 // @ts-ignore
 import { useTransition, animated } from 'react-spring';
 
 export function HomePage(){
-    const transition = useTransition(coords, {
+   const [pages, setPages] = useState<{0: number, 1: number, active: boolean}[]>(() => (coords.map(elem => ({0: elem[0], 1: elem[1], active: false}))));
+
+    const transition = useTransition(pages, {
         from: (item, index) => ({
             top: "50vh",
             left: "calc(50vw + 0vh)",
@@ -16,13 +18,24 @@ export function HomePage(){
             left: `calc(25vw + ${item[0]}vh)`,
             transform: `rotate(${index*72}deg)`
         }),
+        /*update: (item, index) => ({
+            top: (item.active ? item[1] - 10 : item[1]) + "vh",
+            left: `calc(25vw + ${item.active ? item[0] - 10 : item[0]}vh)`
+        }) */
     });
 
     return(
         <>
             <Hero>
                 {transition((props, item, index1, index2 ) => (
-                    <Container style={props}>
+                    <Container style={props}
+                    /*onMouseEnter={() => {
+                        setPages({...pages, [index2]: {...pages[index2], active: true}});
+                    }}
+                    onMouseLeave={() => {
+                        setPages({...pages, [index2]: {...pages[index2], active: false}});
+                    }}*/
+                    >
                         <Item style={{background: colors[index2]}}/>
                     </Container>
                 ))}
@@ -45,11 +58,11 @@ const colors = [
 ];
 
 const coords = [
-    [0, 35, 0],
-    [-33.29, 10.81, 1],
-    [-20.57, -28.32, 2],
-    [20.57, -28.32, 3],
-    [33.29, 10.81, 4]
+    [0, 35],
+    [-33.29, 10.81],
+    [-20.57, -28.32],
+    [20.57, -28.32],
+    [33.29, 10.81]
 ].map(elem => [elem[0] + 50, elem[1] + 50]);
 
 const Item = styled.div`
