@@ -10,33 +10,25 @@ export function HomePage() {
 
   const transition = useTransition(pages, {
     key: item => item.name,
-    config: { friction: 90 },
+    config: {friction: 90},
     from: (item, index) => ({
       degree: 0,
       distance: 0,
       zIndex: 5 - index,
+      gridColumn: 0,
     }),
     enter: (item, index) => ({
-      degree: getDegree(item.name, pages, active),
-      distance: 35,
-      zIndex: 5 - index
+      degree: getPosition(item.name, pages, active) * 72,
+      distance: 40,
+      zIndex: Math.abs(getPosition(item.name, pages, active)),
+      gridColumn: getPosition(item.name, pages, active)
     }),
-    update: (item, index) =>
-      active === item.name
-        ? [
-            {
-              distance: item.hovering ? 30 : 35,
-              config: { friction: 26 },
-              degree: getDegree(item.name, pages, active),
-              zIndex: 6,
-            },
-          ]
-        : {
-            distance: item.hovering ? 30 : 35,
-            config: { friction: 26 },
-            degree: getDegree(item.name, pages, active),
-            zIndex: 5 - index,
-          }
+    update: (item, index) => ({
+      distance: item.hovering ? 35 : 40,
+      config: {friction: 26},
+      degree: getPosition(item.name, pages, active) == 1 ? (pages.find(elem => elem.name === active).hovering ? 90 : 72) : getPosition(item.name, pages, active) * 72 ,
+      zIndex: zIndexForPosition(getPosition(item.name, pages, active)),
+    })
   });
 
   return (
@@ -83,7 +75,7 @@ export function HomePage() {
               });
             }}
           >
-            <Item style={{ background: item.color }} />
+            <Item style={{ background: item.color }}><HeaderText>Text</HeaderText></Item>
           </animated.div>
         ))}
         <HeroMessage>
@@ -113,49 +105,20 @@ const defaultPages: Page[] = [
 type Vector = [number, number];
 type ScreenVector = [number, number];
 
-function getDegree(name: string, pages: Page[], active: string) {
-  const index = defaultPages.findIndex(elem => elem.name === name);
-  let activeIndex = defaultPages.findIndex(elem => elem.name === active);
-  return index * 72 - activeIndex * 72;
-}
 
-function vectorToTransformCss(vector: ScreenVector) {
-  const [x, y] = vector;
-  return `translate3d(${x}vh, ${y}vh, 0)`;
-}
-
-function vectorToScreenSpace(vector: Vector) {
-  const [x, y] = vector;
-  return [x, y] as ScreenVector;
-}
-
-function degreeToRadians(degrees: number) {
-  return degrees * (Math.PI / 180);
-}
-
-function rotate(vector: Vector, degrees: number): Vector {
-  const [x1, y1] = vector;
-  const radians = degreeToRadians(degrees);
-  const x2 = Math.cos(radians) * x1 - Math.sin(radians) * y1;
-  const y2 = Math.sin(radians) * x1 + Math.cos(radians) * y1;
-  return [x2, y2];
-}
-
-function degreeDistanceToVector(
-  degrees: number,
-  distance: number
-): ScreenVector {
-  const defaultPosition: Vector = [0, distance];
-  let rotated = rotate(defaultPosition, degrees);
-  return vectorToScreenSpace(rotated);
-}
 
 const colors = ["#170A1C", "#0B7189", "#228CDB", "#9C95DC", "#C19AB7"];
+
+const HeaderText = styled.span`
+  transform: rotate(180deg);
+`;
 
 const Item = styled.div`
   min-width: 150vw;
   min-height: 150vh;
   background: blue;
+  display: flex;
+  justify-content: center;
 `;
 
 const HeroMessage = styled.div`
